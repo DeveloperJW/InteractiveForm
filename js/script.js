@@ -113,12 +113,16 @@ $(".activities input").change(function (event) {
         let eventName=event.target.name;
         if (eventName==='js-frameworks'){
             $(".activities input").get(3).disabled = true;
+            $(".activities label").eq(3).addClass("is-disabled");
         } else if(eventName==='express'){
             $(".activities input").get(1).disabled = true;
+            $(".activities label").eq(1).addClass("is-disabled");
         } else if(eventName==='js-libs'){
             $(".activities input").get(4).disabled = true;
+            $(".activities label").eq(4).addClass("is-disabled");
         } else if(eventName==='node'){
             $(".activities input").get(2).disabled = true;
+            $(".activities label").eq(2).addClass("is-disabled");
         }
         total += getPrice(event.target.name);
         $total_price.show();
@@ -128,12 +132,17 @@ $(".activities input").change(function (event) {
         let eventName=event.target.name;
         if (eventName==='js-frameworks'){
             $(".activities input").get(3).disabled = false;
+            $(".activities label").eq(3).removeClass("is-disabled");
+            // $(".activities input").get(3).css({});
         } else if(eventName==='express'){
             $(".activities input").get(1).disabled = false;
+            $(".activities label").eq(1).removeClass("is-disabled");
         } else if(eventName==='js-libs'){
             $(".activities input").get(4).disabled = false;
+            $(".activities label").eq(4).removeClass("is-disabled");
         } else if(eventName==='node'){
             $(".activities input").get(2).disabled = false;
+            $(".activities label").eq(2).removeClass("is-disabled");
         }
         total -= getPrice(event.target.name);
         // console.log(total);
@@ -167,12 +176,14 @@ credit_card.next().next().hide();//hide bitcoin message
 $('#payment').change(function () {
     credit_card.hide();
     credit_card.next().hide();
-    credit_card.next().next().hide();
+    credit_card.next().next().hide();//hide the error message on credit card while users switch to other payments
+    $('#payment-message').hide();
     $("#payment option:selected").each(function () {
         let payment=$(this).val();
         // if($(this)value==='js puns'){
         if (payment === 'credit card'){
             credit_card.show();
+            $('#payment-message').show();//show the error message when user switch back to credit card
         } else if(payment==='paypal'){
             console.log('Paypal selected');
             credit_card.next().show();

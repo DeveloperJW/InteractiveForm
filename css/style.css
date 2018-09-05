@@ -149,6 +149,11 @@ button:hover {
   clear: both;
 }
 
+.is-disabled {
+	color: grey;
+	text-decoration: line-through;
+}
+
 /* ================================= 
   Media Queries
 ==================================== */

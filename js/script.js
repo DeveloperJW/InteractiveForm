@@ -1,3 +1,31 @@
+/**
+ * validArr is an array of booleans
+ * {
+ *     0: Name Field Validity
+ *     1: Email Field Validity
+ *     2: Activities Validity
+ *     3: Credit Number Validity
+ *     4: Zip Code Validity
+ *     5: CVV Validity
+ * }
+ * @type {Array}
+ */
+let validArr=[];
+
+/**
+ * Helper functions created for this project
+ */
+//Function checkNumber check if the value contains only numbers from 0-9 using regular expression
+const checkNumber = (value) => {
+    let valid=/^\d+$/.test(value);
+    return valid;
+};
+
+//functions created following DRY principles
+// the function is used to assign true or false to validArr
+let assignFalse= index => validArr[index]= false;
+let assignTrue= index => validArr[index]=true;
+
 /*
 Set focus on the first text field
 When the page first loads, the first text field should be in focus by default.
@@ -10,7 +38,6 @@ $name.first().focus();
 Include a text field that will be revealed when the "Other" option is selected from the "Job Role" drop down menu.
 Give the field an id of “other-title,” and add the placeholder text of "Your Job Role".
  */
-let selected_option = $('#title option:selected');
 // first, hide the input. Only display when other is selected.
 $( '#other-title' ).hide();
 //next, if option Other is selected, show the input with placeholder="Your JOb Role"
@@ -194,22 +221,18 @@ $('#payment').change(function () {
     });
 });
 
-//Function checkNumber check if the value contains only numbers from 0-9 using regular expression
-let checkNumber = (value) => {
-    let valid=/^\d+$/.test(value);
-    return valid;
-};
 //set up form validation when the register button is clicked
 $('.activities legend').append(`<span id="activities-span"></span>`);
 $('form').on('submit',function (event) {
-    let elements=this.elements;
-    event.preventDefault();
+
     //Register for Activities checkboxes (at least one must be selected)
     if (numOfCheckedActivities===0){
+        assignFalse(2);
         $('.activities').css({ "border":"2px solid red"});
         $('#activities-span').text(" at least one must be selected").css({"color":"red"});
 
     } else{
+        assignTrue(2);
         $('.activities').css({ "border":"2px solid lime"});
         $('#activities-span').text('');
     }
@@ -217,64 +240,82 @@ $('form').on('submit',function (event) {
     $("#credit-card").before(`<p id="payment-message"></p>`);
     let $payment_msg= $('#payment-message');
     $payment_msg.css({"color":"red"});
-    if ( $("#payment option:selected")[0].value === "credit card"){
+    if ( $("#payment option:selected")[0].value === "credit card") {
         let cardNum= $('#cc-num')[0].value;
         let cardNumValid=checkNumber(cardNum);
         if (cardNum ===''){
+            assignFalse(3);
             $payment_msg.text("Please enter a credit card number");
             $('#cc-num').css({"border-color":"red"});
         } else if(!cardNumValid){
+            assignFalse(3);
             $payment_msg.text("You can only enter numbers, no letters or special characters.");
             $('#cc-num').css({"border-color":"red"});
         } else if(cardNum.length<13 || cardNum.length>16){
+            assignFalse(3);
             $payment_msg.text("Please enter a number that is between 13 and 16 digits long.");
             $('#cc-num').css({"border-color":"red"});
         } else{
+            assignTrue(3);
             $payment_msg.text("");
             $('#cc-num').css({"border-color":"lime"});
         }//end of card number validation
 
         // check the validation of zip code
-        const $zipSpan=$('#payment-message').append(`<span id="zip-span"></span>`);
         let $zip_msg=$('#zip-span');
         let $zipCode= $('#zip');
         let zipCodeValue=$zipCode[0].value;
         let zipValid=checkNumber(zipCodeValue);
         if (zipCodeValue===''){
+            assignFalse(4);
             $zip_msg.html(` <br>Please enter your zip code.`);
             $zipCode.css({"border-color":"red"});
         } else if (!zipValid){
+            assignFalse(4);
             $zip_msg.html(`<br>You can only enter numbers, no letters or special characters.`);
             $zipCode.css({"border-color":"red"});
         } else if (zipCodeValue.length !==5){
+            assignFalse(4);
             $zip_msg.html(`<br>The zip code must be a 5 digit number.`);
             $zipCode.css({"border-color":"red"});
         } else{
+            assignTrue(4);
             $zip_msg.html(``);
             $zipCode.css({"border-color":"lime"});
         }// end of zip code validation
 
         // CVV validation
-        const $cvvSpan=$('#payment-message').append(`<span id="cvv-span"></span>`);
         let $cvv_msg=$('#cvv-span');
         let $cvv= $('#cvv');
         let cvvValue=$cvv[0].value;
         let cvvValid=checkNumber(cvvValue);
         if (cvvValue===''){
+            assignFalse(5);
             $cvv_msg.html(` <br>Please enter your CVV.`);
             $cvv.css({"border-color":"red"});
         } else if (!cvvValid){
+            assignFalse(5);
             $cvv_msg.html(`<br>You can only enter numbers, no letters or special characters.`);
             $cvv.css({"border-color":"red"});
         } else if (cvvValue.length <3 || cvvValue.length>4){
+            assignFalse(5);
             $cvv_msg.html(`<br>The CVV is either 3-digit or 4-digit.`);
             $cvv.css({"border-color":"red"});
         } else{
+            assignTrue(5);
             $cvv_msg.html(``);
             $cvv.css({"border-color":"lime"});
         }//end of CVV valid
 
     }//end of the if credit card is selected
+
+    // use Array.every() method to check if there is any error in the form
+    // if error exists, the form is not submitted by using event.preventDefault()
+    if(validArr.every(element=>element===true)){
+
+    } else{
+        event.preventDefault();
+    }
 
 });
 
@@ -289,11 +330,12 @@ $name.on('change keypress keyup focusout',function () {
     // /^[a-zA-Z]+$/
     let valid = /^[a-zA-Z]+$/.test(name);
     if (!valid){
-        // console.log("The name can not be empty");
+        assignFalse(0);
         $('#name-span').text("      "+"Invalid Name!");
         name_msg.css({"color":"red", "border-color":"red"});
         $name.css({"border-color":"red"});
     } else{
+        assignTrue(0);
         $('#name-span').text("      "+"Okay!");
         name_msg.css({"color":"lime", "border-color":"lime"});
         $name.css({"border-color":"lime"});
@@ -310,12 +352,12 @@ $email.on('change keypress keyup focusout',function (event) {
     let valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emailVal);
     // console.log(valid);
     if (!valid){
-        // console.log("Please enter an valid email address.");
+        assignFalse(1);
         mail_msg.text(" Please enter an valid email address");
         mail_msg.css({"color":"red", "border-color":"red"});
         $email.css({"border-color":"red"});
     } else{
-        // console.log('The email is valid');
+        assignTrue(1);
         $('#mail-span').text("  the email is valid");
         mail_msg.css({"color":"lime", "border-color":"lime"});
         $email.css({"border-color":"lime"});
